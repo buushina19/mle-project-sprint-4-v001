@@ -2,54 +2,38 @@
 
 ## Склонируйте репозиторий
 
-Склонируйте репозиторий проекта:
-
 ```
-git clone https://github.com/yandex-praktikum/mle-project-sprint-4-v001.git
+git clone <ссылка-на-ваш-репозиторий>
+cd mle-project-sprint-4-v001
 ```
 
 ## Активируйте виртуальное окружение
 
-Используйте то же самое виртуальное окружение, что и созданное для работы с уроками. Если его не существует, то его следует создать.
-
-Создать новое виртуальное окружение можно командой:
-
 ```
-python3 -m venv env_recsys_start
-```
-
-После его инициализации следующей командой
-
-```
-. env_recsys_start/bin/activate
-```
-
-установите в него необходимые Python-пакеты следующей командой
-
-```
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
 ```
 
 ### Скачайте файлы с данными
 
-Для начала работы понадобится три файла с данными:
-- [tracks.parquet](https://storage.yandexcloud.net/mle-data/ym/tracks.parquet)
-- [catalog_names.parquet](https://storage.yandexcloud.net/mle-data/ym/catalog_names.parquet)
-- [interactions.parquet](https://storage.yandexcloud.net/mle-data/ym/interactions.parquet)
- 
-Скачайте их в директорию локального репозитория. Для удобства вы можете воспользоваться командой wget:
+```
+mkdir -p data
+wget -P data/ https://storage.yandexcloud.net/mle-data/ym/tracks.parquet
+wget -P data/ https://storage.yandexcloud.net/mle-data/ym/catalog_names.parquet
+wget -P data/ https://storage.yandexcloud.net/mle-data/ym/interactions.parquet
+```
+
+Создайте файл `.env`:
 
 ```
-wget https://storage.yandexcloud.net/mle-data/ym/tracks.parquet
-
-wget https://storage.yandexcloud.net/mle-data/ym/catalog_names.parquet
-
-wget https://storage.yandexcloud.net/mle-data/ym/interactions.parquet
+S3_BUCKET_NAME=...
+S3_ENDPOINT_URL=https://storage.yandexcloud.net
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
 ```
 
 ## Запустите Jupyter Lab
-
-Запустите Jupyter Lab в командной строке
 
 ```
 jupyter lab --ip=0.0.0.0 --no-browser
@@ -57,7 +41,33 @@ jupyter lab --ip=0.0.0.0 --no-browser
 
 # Расчёт рекомендаций
 
-Код для выполнения первой части проекта находится в файле `recommendations.ipynb`. Изначально, это шаблон. Используйте его для выполнения первой части проекта.
+Основной код — в `recommendations.ipynb`.
+
+Полный пайплайн (этапы 1–3) можно запустить одной командой:
+
+```
+python scripts/build_recommendations.py
+```
+
+Только этап 3 (8 GB RAM):
+
+```
+python -u scripts/run_stage3.py 2>&1 | tee stage3.log
+```
+
+Если этап 3 прервался после ALS/CatBoost train (есть `personal_als.parquet`, `similar.parquet`, `models/cb_model.cbm`):
+
+```
+python -u scripts/resume_stage3.py 2>&1 | tee stage3_resume.log
+```
+
+Облегчить этап 3 в ноутбуке (загрузка готовых parquet вместо тяжёлых вычислений):
+
+```
+python scripts/patch_notebook_stage3.py
+```
+
+Скрипт создаёт `items.parquet`, `events.parquet`, `top_popular.parquet`, `personal_als.parquet`, `similar.parquet`, `recommendations.parquet`, `metrics_summary.csv` и загружает их в S3 (`recsys/data/` и `recsys/recommendations/`).
 
 # Сервис рекомендаций
 
