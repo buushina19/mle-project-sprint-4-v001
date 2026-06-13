@@ -167,6 +167,7 @@ cython_debug/
 
 # logs and training artifacts
 *.log
+!test_service.log
 catboost_info/
 models/
 metrics_summary.csv
