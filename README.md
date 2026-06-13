@@ -49,25 +49,7 @@ jupyter lab --ip=0.0.0.0 --no-browser
 python scripts/build_recommendations.py
 ```
 
-Только этап 3 (8 GB RAM):
-
-```
-python -u scripts/run_stage3.py 2>&1 | tee stage3.log
-```
-
-Если этап 3 прервался после ALS/CatBoost train (есть `personal_als.parquet`, `similar.parquet`, `models/cb_model.cbm`):
-
-```
-python -u scripts/resume_stage3.py 2>&1 | tee stage3_resume.log
-```
-
-Облегчить этап 3 в ноутбуке (загрузка готовых parquet вместо тяжёлых вычислений):
-
-```
-python scripts/patch_notebook_stage3.py
-```
-
-Скрипт создаёт `items.parquet`, `events.parquet`, `top_popular.parquet`, `personal_als.parquet`, `similar.parquet`, `recommendations.parquet`, `metrics_summary.csv` и загружает их в S3 (`recsys/data/` и `recsys/recommendations/`).
+Скрипт создаёт `items.parquet`, `events.parquet`, `top_popular.parquet`, `personal_als.parquet`, `similar.parquet`, `recommendations.parquet` и загружает их в S3 (`recsys/data/` и `recsys/recommendations/`).
 
 # Сервис рекомендаций
 

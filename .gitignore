@@ -165,5 +165,20 @@ cython_debug/
 *.parquet
 *.pickle
 
+# logs and training artifacts
+*.log
+catboost_info/
+models/
+metrics_summary.csv
+.ipynb_checkpoints/
+
+# internal helper scripts (not for repo)
+scripts/run_stage3.py
+scripts/resume_stage3.py
+scripts/run_notebook.py
+scripts/patch_notebook_light.py
+scripts/patch_notebook_stage3.py
+scripts/update_notebook.py
+
 # project environment
 env_recsys_start/
